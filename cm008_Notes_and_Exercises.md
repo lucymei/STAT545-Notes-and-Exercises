@@ -1,13 +1,8 @@
----
-title: 'cm008: Notes and Exercises'
-date: '2017-09-28'
-output: 
-    html_document:
-      keep_md: yes
-      toc: yes
----
+# cm008: Notes and Exercises
+2017-09-28  
 
-```{r}
+
+```r
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
 ```
@@ -40,29 +35,49 @@ The first argument is a "formula" object in R. It's typically used in modelling 
 
 Let's fit the regression curve that we see in this plot, using `lm`:
 
-```{r}
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point() +
     geom_smooth(method="lm") +
     scale_x_log10()
 ```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
 Here's the code:
 
-```{r}
+
+```r
 fit1 <- lm(lifeExp ~ log(gdpPercap), data=gapminder)
 ```
 
 What does this `fit1` object look like?
 
-```{r}
+
+```r
 fit1
+```
+
+```
+## 
+## Call:
+## lm(formula = lifeExp ~ log(gdpPercap), data = gapminder)
+## 
+## Coefficients:
+##    (Intercept)  log(gdpPercap)  
+##         -9.101           8.405
 ```
 
 That's odd... what kind of R object is that??
 
-```{r}
+
+```r
 typeof(fit1)
+```
+
+```
+## [1] "list"
 ```
 
 It's a list, but R isn't presenting it that way. It just looks like a bunch of text, but it's not. Let's use the `lapply` function to uncover its true nature -- a list.
@@ -72,9 +87,105 @@ It's a list, but R isn't presenting it that way. It just looks like a bunch of t
     - `lapply` loops over each component of a vector or list (_first argument_), applies a function to it (that you specify in the _second argument_), and outputs the function output in a list.
     - Let's do this for an `lm` fit to `head(gapminder)`, so that the output doesn't take up a lot of space. 
 
-```{r}
+
+```r
 fit1_small <- lm(lifeExp ~ log(gdpPercap), data=head(gapminder))
 lapply(fit1_small, identity) 
+```
+
+```
+## $coefficients
+##    (Intercept) log(gdpPercap) 
+##      187.61570      -23.08098 
+## 
+## $residuals
+##          1          2          3          4          5          6 
+## -5.1280595 -2.4023520  0.1520397  1.7131151  0.9597015  4.7055553 
+## 
+## $effects
+##    (Intercept) log(gdpPercap)                                              
+##     -81.517386       2.710390       2.070161       3.508404       2.004734 
+##                
+##       6.121766 
+## 
+## $rank
+## [1] 2
+## 
+## $fitted.values
+##        1        2        3        4        5        6 
+## 33.92906 32.73435 31.84496 32.30688 35.12830 33.73244 
+## 
+## $assign
+## [1] 0 1
+## 
+## $qr
+## $qr
+##   (Intercept) log(gdpPercap)
+## 1  -2.4494897    -16.3790824
+## 2   0.4082483     -0.1174296
+## 3   0.4082483      0.5987063
+## 4   0.4082483      0.4282789
+## 5   0.4082483     -0.6126834
+## 6   0.4082483     -0.0976823
+## attr(,"assign")
+## [1] 0 1
+## 
+## $qraux
+## [1] 1.408248 1.270565
+## 
+## $pivot
+## [1] 1 2
+## 
+## $tol
+## [1] 1e-07
+## 
+## $rank
+## [1] 2
+## 
+## attr(,"class")
+## [1] "qr"
+## 
+## $df.residual
+## [1] 4
+## 
+## $xlevels
+## named list()
+## 
+## $call
+## lm(formula = lifeExp ~ log(gdpPercap), data = head(gapminder))
+## 
+## $terms
+## lifeExp ~ log(gdpPercap)
+## attr(,"variables")
+## list(lifeExp, log(gdpPercap))
+## attr(,"factors")
+##                log(gdpPercap)
+## lifeExp                     0
+## log(gdpPercap)              1
+## attr(,"term.labels")
+## [1] "log(gdpPercap)"
+## attr(,"order")
+## [1] 1
+## attr(,"intercept")
+## [1] 1
+## attr(,"response")
+## [1] 1
+## attr(,".Environment")
+## <environment: R_GlobalEnv>
+## attr(,"predvars")
+## list(lifeExp, log(gdpPercap))
+## attr(,"dataClasses")
+##        lifeExp log(gdpPercap) 
+##      "numeric"      "numeric" 
+## 
+## $model
+##   lifeExp log(gdpPercap)
+## 1  28.801       6.658583
+## 2  30.332       6.710344
+## 3  31.997       6.748878
+## 4  34.020       6.728864
+## 5  36.088       6.606625
+## 6  38.438       6.667101
 ```
 
 Why isn't R printing out the list, then? Because it's a special type of list -- it's of class `"lm"`, something that the makers of the `lm` function decided. Whenever R encounters this object, it also has a special way of printing it to screen. 
@@ -85,33 +196,71 @@ This is the idea of the "object oriented" part of R -- something covered more in
 
 The `predict` function works on `"lm"` objects to make predictions. If you don't specify new data, it will make predictions using the existing X values. Let's look at the first six:
 
-```{r}
+
+```r
 predict(fit1) %>% head
+```
+
+```
+##        1        2        3        4        5        6 
+## 46.86506 47.30012 47.62400 47.45579 46.42835 46.93666
 ```
 
 How about plotted against the original X values? (Which was log gdpPercap)
 
-```{r}
+
+```r
 qplot(log(gapminder$gdpPercap), predict(fit1))
 ```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 For fun... let's put this overtop of the scatterplot:
 
-```{r}
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point(alpha=0.1) +
     geom_point(y=predict(fit1), colour="red") +
     scale_x_log10()
 ```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 You can predict with new data, too, as long as the data frame you enter has the same column names as your X values. 
 put in y =predict(fit1) to overwrite the lifeExp of line 100.
 Can also use ggplot geom_smooth(method="lm") to make the linear line but you cannot extract the coefficient in this case.
 
-```{r}
+
+```r
 (my_newdata <- data.frame(gdpPercap=c(100, 547, 289)))
+```
+
+```
+##   gdpPercap
+## 1       100
+## 2       547
+## 3       289
+```
+
+```r
 predict(fit1, newdata=my_newdata)
+```
+
+```
+##        1        2        3 
+## 29.60596 43.88854 38.52591
+```
+
+```r
 predict(fit1, newdata=filter(gapminder, country=="Canada"))
+```
+
+```
+##        1        2        3        4        5        6        7        8 
+## 69.38986 70.18158 70.81182 72.30336 73.69461 74.97451 75.27641 76.54409 
+##        9       10       11       12 
+## 76.45408 77.24871 78.43120 79.15337
 ```
 predict returns a vector of the prediction.
 
@@ -121,20 +270,53 @@ We can extract a bunch of things from the `lm` output.
 
 - Regression coefficients? They're stored in the `$coefficients` part of the list. Or, use the `coeff` function.
 
-```{r}
+
+```r
 fit1$coefficients
+```
+
+```
+##    (Intercept) log(gdpPercap) 
+##      -9.100889       8.405085
+```
+
+```r
 coef(fit1)
+```
+
+```
+##    (Intercept) log(gdpPercap) 
+##      -9.100889       8.405085
 ```
 
 - Residuals? They're stored in the `$residuals` part of the list. Or, use the `resid` function. (Let's only display the first six... but plot all of them!)
 
-```{r}
+
+```r
 fit1$residuals %>% head
+```
+
+```
+##          1          2          3          4          5          6 
+## -18.064063 -16.968123 -15.627000 -13.435788 -10.340352  -8.498661
+```
+
+```r
 resid(fit1) %>% head
+```
+
+```
+##          1          2          3          4          5          6 
+## -18.064063 -16.968123 -15.627000 -13.435788 -10.340352  -8.498661
+```
+
+```r
 qplot(log(gapminder$gdpPercap), resid(fit1)) +
     geom_hline(yintercept=0,
                linetype="dashed")
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 `lm` is kind of annoying in that not everything you might want is there. You can access more things using the `summary` function. What's printed to screen after `summary`, though, _is_ quite nice!
 
@@ -146,8 +328,30 @@ span works better when the data is not discrete.
 
 lm does not give R^2 values
 
-```{r}
+
+```r
 (summ_fit1 <- summary(fit1))
+```
+
+```
+## 
+## Call:
+## lm(formula = lifeExp ~ log(gdpPercap), data = gapminder)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -32.778  -4.204   1.212   4.658  19.285 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)     -9.1009     1.2277  -7.413 1.93e-13 ***
+## log(gdpPercap)   8.4051     0.1488  56.500  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 7.62 on 1702 degrees of freedom
+## Multiple R-squared:  0.6522,	Adjusted R-squared:  0.652 
+## F-statistic:  3192 on 1 and 1702 DF,  p-value: < 2.2e-16
 ```
 It is a list that is being displayed as a bunch of text.
 When summary is called, it specified what type of object is in (). So when doing summary(filt1), it is executing summary.lm
@@ -157,25 +361,113 @@ You can see all sorts of things, like p-values, $R^2$ (and adjusted $R^2$ values
 
 As before, this looks nice and all... but what the heck is this new object? Again, it's a list. Let's see its components (again, with the smaller fit, so that we don't take over all the space on the screen).
 
-```{r}
+
+```r
 summ_fit1_small <- summary(fit1_small)
 typeof(summ_fit1_small)
+```
+
+```
+## [1] "list"
+```
+
+```r
 lapply(summ_fit1_small, identity)  # Pry it open!!
+```
+
+```
+## $call
+## lm(formula = lifeExp ~ log(gdpPercap), data = head(gapminder))
+## 
+## $terms
+## lifeExp ~ log(gdpPercap)
+## attr(,"variables")
+## list(lifeExp, log(gdpPercap))
+## attr(,"factors")
+##                log(gdpPercap)
+## lifeExp                     0
+## log(gdpPercap)              1
+## attr(,"term.labels")
+## [1] "log(gdpPercap)"
+## attr(,"order")
+## [1] 1
+## attr(,"intercept")
+## [1] 1
+## attr(,"response")
+## [1] 1
+## attr(,".Environment")
+## <environment: R_GlobalEnv>
+## attr(,"predvars")
+## list(lifeExp, log(gdpPercap))
+## attr(,"dataClasses")
+##        lifeExp log(gdpPercap) 
+##      "numeric"      "numeric" 
+## 
+## $residuals
+##          1          2          3          4          5          6 
+## -5.1280595 -2.4023520  0.1520397  1.7131151  0.9597015  4.7055553 
+## 
+## $coefficients
+##                 Estimate Std. Error    t value  Pr(>|t|)
+## (Intercept)    187.61570  217.00328  0.8645754 0.4360391
+## log(gdpPercap) -23.08098   32.45198 -0.7112350 0.5162158
+## 
+## $aliased
+##    (Intercept) log(gdpPercap) 
+##          FALSE          FALSE 
+## 
+## $sigma
+## [1] 3.810822
+## 
+## $df
+## [1] 2 4 2
+## 
+## $r.squared
+## [1] 0.1122662
+## 
+## $adj.r.squared
+## [1] -0.1096672
+## 
+## $fstatistic
+##     value     numdf     dendf 
+## 0.5058553 1.0000000 4.0000000 
+## 
+## $cov.unscaled
+##                (Intercept) log(gdpPercap)
+## (Intercept)      3242.6148     -484.90771
+## log(gdpPercap)   -484.9077       72.51789
 ```
 
 There we have it. Now, what would you like to extract?:
 
 - R-squared? R-squared adjusted? Okay:
 
-```{r}
+
+```r
 summ_fit1$r.squared
+```
+
+```
+## [1] 0.6522466
+```
+
+```r
 summ_fit1$adj.r.squared
+```
+
+```
+## [1] 0.6520423
 ```
 
 - Estimated standard devaition of the random error term? Okay:
 
-```{r}
+
+```r
 summ_fit1$sigma
+```
+
+```
+## [1] 7.619535
 ```
 
 Where can we find the documentation for the components of _this_ list, though, if it's not in the documentation for `lm`? Look at the documentation of `summary.lm`. 
@@ -220,21 +512,52 @@ There's one more important thing with `dplyr` that you ought to know: applying `
 
 Remember applying `summarize` to a grouped tibble?
 
-```{r}
+
+```r
 gapminder %>%
     group_by(continent) %>% 
     summarize(mean_gdpPercap = mean(gdpPercap),
               n_countries    = length(gdpPercap))
+```
+
+```
+## # A tibble: 5 x 3
+##   continent mean_gdpPercap n_countries
+##      <fctr>          <dbl>       <int>
+## 1    Africa       2193.755         624
+## 2  Americas       7136.110         300
+## 3      Asia       7902.150         396
+## 4    Europe      14469.476         360
+## 5   Oceania      18621.609          24
 ```
 Summarize collapses the group into one row, aggregates the number to one number.
 
 
 Well, we can also apply `mutate` to each group, too. For example, let's calculate the growth in population since the first year on record _for each country_:
 
-```{r}
+
+```r
 gapminder %>% 
     group_by(country) %>% 
     mutate(pop_growth = pop - pop[1])
+```
+
+```
+## # A tibble: 1,704 x 7
+## # Groups:   country [142]
+##        country continent  year lifeExp      pop gdpPercap pop_growth
+##         <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>      <int>
+##  1 Afghanistan      Asia  1952  28.801  8425333  779.4453          0
+##  2 Afghanistan      Asia  1957  30.332  9240934  820.8530     815601
+##  3 Afghanistan      Asia  1962  31.997 10267083  853.1007    1841750
+##  4 Afghanistan      Asia  1967  34.020 11537966  836.1971    3112633
+##  5 Afghanistan      Asia  1972  36.088 13079460  739.9811    4654127
+##  6 Afghanistan      Asia  1977  38.438 14880372  786.1134    6455039
+##  7 Afghanistan      Asia  1982  39.854 12881816  978.0114    4456483
+##  8 Afghanistan      Asia  1987  40.822 13867957  852.3959    5442624
+##  9 Afghanistan      Asia  1992  41.674 16317921  649.3414    7892588
+## 10 Afghanistan      Asia  1997  41.763 22227415  635.3414   13802082
+## # ... with 1,694 more rows
 ```
 If each country has the same number of years but not in order - use arrange function.
 
@@ -244,10 +567,29 @@ Notice that `dplyr` has retained the original grouping -- it hasn't pealed back 
 
 How about growth compared to `1972`?
 
-```{r}
+
+```r
 gapminder %>% 
     group_by(country) %>% 
     mutate(pop_growth = pop - pop[year==1972])
+```
+
+```
+## # A tibble: 1,704 x 7
+## # Groups:   country [142]
+##        country continent  year lifeExp      pop gdpPercap pop_growth
+##         <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>      <int>
+##  1 Afghanistan      Asia  1952  28.801  8425333  779.4453   -4654127
+##  2 Afghanistan      Asia  1957  30.332  9240934  820.8530   -3838526
+##  3 Afghanistan      Asia  1962  31.997 10267083  853.1007   -2812377
+##  4 Afghanistan      Asia  1967  34.020 11537966  836.1971   -1541494
+##  5 Afghanistan      Asia  1972  36.088 13079460  739.9811          0
+##  6 Afghanistan      Asia  1977  38.438 14880372  786.1134    1800912
+##  7 Afghanistan      Asia  1982  39.854 12881816  978.0114    -197644
+##  8 Afghanistan      Asia  1987  40.822 13867957  852.3959     788497
+##  9 Afghanistan      Asia  1992  41.674 16317921  649.3414    3238461
+## 10 Afghanistan      Asia  1997  41.763 22227415  635.3414    9147955
+## # ... with 1,694 more rows
 ```
 lag() apply to the population vector, it will skew everything up one, can shift by more than one year.
 
@@ -290,13 +632,16 @@ There are ["complete themes"](http://ggplot2.tidyverse.org/reference/ggtheme.htm
 
 Let's see an example:
 
-```{r}
+
+```r
 p1 <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     facet_wrap(~ continent) +
     geom_point(colour="#386CB0", alpha=0.2) +
     scale_x_log10()
 p1 + theme_bw()
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 The general `theme` function gives you vast functionality... just check its documentation to see what things you can change. The arguments of `theme` follow a naming convention: `general.to.specific`
 
@@ -320,23 +665,32 @@ Check out their documentation to see exactly how each feature is modified.
     - change the axis titles' font sizes to 14, and 
     - change the panel titles' font sizes to 14 and bolded.
 
-```{r}
+
+```r
 p1 +
     theme(strip.background = element_rect(fill="orange"),
           axis.title = element_text(size=14),
           strip.text = element_text(size=14, face="bold"))
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
 strip off background - refers to the background label - element_rect because it is a rectangle and to specify what you want to fill the background.
 change x axis and y axis to have a size of 14 
 __Another example__: do the same, but in conjunction with the `theme_bw` (notice the order)
 
-```{r}
+
+```r
 ## Correct:
 p1 +
     theme_bw() +
     theme(strip.background = element_rect(fill="orange"),
           axis.title = element_text(size=14),
           strip.text = element_text(size=14, face="bold"))
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+
+```r
 ## Incorrect:
 p1 +
     theme(strip.background = element_rect(fill="orange"),
@@ -344,6 +698,8 @@ p1 +
           strip.text = element_text(size=14, face="bold")) +
     theme_bw()  # Overrides the previous `theme` call!
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-22-2.png)<!-- -->
 
 
 ### 3.2 Modifying scales
@@ -370,26 +726,49 @@ There are many useful arguments here. Some are more self-explanatory than others
 - `name`. The first argument. Indicate the name of the scale/legend here.
     - You can also use the `labs` function for X and Y axes, and even plot title.
 
-```{r}
+
+```r
 p1 + scale_y_continuous("Life Expectancy")
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+
+```r
 p1 + labs(x="GDP per capita", 
           y="Life Expectancy",
           title="My Plot")
+```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-23-2.png)<!-- -->
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point(aes(colour=continent),
                alpha=0.2) +
     scale_colour_discrete("Continents of\n the World")
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-23-3.png)<!-- -->
 "\n - make a new line
 
 - `breaks` (Typically of a continuous scale). Here, you get to specify _where_ along the scale you'd like to display a value. 
     - Numbers are on the scale of the data (such as population), not the geometric scale (such as a hex colour code, or number of pixels over in a plot). 
 
-```{r}
+
+```r
 ## Log lines:
 p1 + scale_x_log10(breaks=c((1:10)*1000,
                             (1:10)*10000))
+```
+
+```
+## Scale for 'x' is already present. Adding another scale for 'x', which
+## will replace the existing scale.
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+
+```r
 ## Where you want the x marks to go 
 
 p2 <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
@@ -397,20 +776,35 @@ p2 <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
                alpha=0.2)
 ## Default breaks
 p2 + scale_colour_continuous("Population\nin billions")
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-24-2.png)<!-- -->
+
+```r
 ## New breaks
 p2 + scale_colour_continuous("Population\nin billions",
                              breaks=seq(0,2,by=0.2))
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-24-3.png)<!-- -->
+
+```r
 ## Mark breaks in increment of 2
 ```
 
 - `labels`. Text to replace the data value labels. Most useful for discrete data.
 
-```{r}
+
+```r
 ## Not a good idea:
 p2 + scale_colour_continuous("My odd\npopulation\nscale",
                              breaks=c(0.2, 0.7, 1.2),
                              labels=c("small", "bigger", "big"))
+```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+
+```r
 ## Discrete scale:
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point(aes(colour=continent),
@@ -418,18 +812,35 @@ ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     scale_colour_discrete(labels=c("Af", "Am", "As", "Eu", "Oc"))
 ```
 
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-25-2.png)<!-- -->
+
 - `limits`. Lower and upper bounds of the data that you'd like displayed. Leave one as `NA` if you want to use the default.
 
-```{r}
+
+```r
 p1 + scale_y_continuous(limits=c(60,NA))
 ```
 
+```
+## Warning: Removed 827 rows containing missing values (geom_point).
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-26-1.png)<!-- -->
+
 - `position`. Position of the scale. Also controllable using `theme` for the legend.
 
-```{r}
+
+```r
 p1 + scale_y_continuous(position="right")
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+```r
 p2 + theme(legend.position = "bottom")
 ```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-27-2.png)<!-- -->
 
 ## 4. Exercises. 
 
@@ -438,7 +849,8 @@ Practice these concepts in the following exercises.
 __Exercise 1__: Suppose we want to calculate some quantity for each country in the `gapminder` data set. For each of the following quantities, indicate whether the function is _vectorized_, _aggregate_, or _window_, and use `dplyr` functions to calculate the specified variable.
 
 - The change in population from 1962 to 1972.
-```{r}
+
+```r
 ## The change in population from 1962 to 1972
 ## It's an Aggregate function
 gapminder %>%
@@ -446,32 +858,109 @@ gapminder %>%
   arrange(year) %>%
   group_by(country) %>%
   summarize(pop_chg=diff(pop))
+```
 
+```
+## # A tibble: 142 x 2
+##        country  pop_chg
+##         <fctr>    <int>
+##  1 Afghanistan  2812377
+##  2     Albania   535417
+##  3     Algeria  3759839
+##  4      Angola  1068843
+##  5   Argentina  3496016
+##  6   Australia  2382032
+##  7     Austria   414337
+##  8     Bahrain    58937
+##  9  Bangladesh 13920006
+## 10     Belgium   490700
+## # ... with 132 more rows
+```
+
+```r
 gapminder %>%
   group_by(country) %>%
 summarise(pop_chg=pop[year==1972]-pop[year==1962])
+```
 
+```
+## # A tibble: 142 x 2
+##        country  pop_chg
+##         <fctr>    <int>
+##  1 Afghanistan  2812377
+##  2     Albania   535417
+##  3     Algeria  3759839
+##  4      Angola  1068843
+##  5   Argentina  3496016
+##  6   Australia  2382032
+##  7     Austria   414337
+##  8     Bahrain    58937
+##  9  Bangladesh 13920006
+## 10     Belgium   490700
+## # ... with 132 more rows
+```
+
+```r
 ## mutate() won't work 
-
 ```
 
 - The population, in billions.
-```{r}
+
+```r
 ## It is a vectorized function.
 gapminder %>%
   mutate(popm = pop/10^9)
 ```
 
+```
+## # A tibble: 1,704 x 7
+##        country continent  year lifeExp      pop gdpPercap        popm
+##         <fctr>    <fctr> <int>   <dbl>    <int>     <dbl>       <dbl>
+##  1 Afghanistan      Asia  1952  28.801  8425333  779.4453 0.008425333
+##  2 Afghanistan      Asia  1957  30.332  9240934  820.8530 0.009240934
+##  3 Afghanistan      Asia  1962  31.997 10267083  853.1007 0.010267083
+##  4 Afghanistan      Asia  1967  34.020 11537966  836.1971 0.011537966
+##  5 Afghanistan      Asia  1972  36.088 13079460  739.9811 0.013079460
+##  6 Afghanistan      Asia  1977  38.438 14880372  786.1134 0.014880372
+##  7 Afghanistan      Asia  1982  39.854 12881816  978.0114 0.012881816
+##  8 Afghanistan      Asia  1987  40.822 13867957  852.3959 0.013867957
+##  9 Afghanistan      Asia  1992  41.674 16317921  649.3414 0.016317921
+## 10 Afghanistan      Asia  1997  41.763 22227415  635.3414 0.022227415
+## # ... with 1,694 more rows
+```
+
 - The lagged gdpPercap
     - i.e., the value that appears for 1962 would be the gdpPercap in 1957 (the previous entry).
     - Hint: use the `lag` function, then filter out the `NA`'s created with the `is.na` function.
-```{r}
+
+```r
 ## It is a window function.
 gapminder %>%
   group_by(country) %>%
   arrange(year) %>%
   mutate(lag_gdpPercap=lag(gdpPercap)) %>%
   filter(!is.na(lag_gdpPercap))
+```
+
+```
+## # A tibble: 1,562 x 7
+## # Groups:   country [142]
+##        country continent  year lifeExp      pop  gdpPercap lag_gdpPercap
+##         <fctr>    <fctr> <int>   <dbl>    <int>      <dbl>         <dbl>
+##  1 Afghanistan      Asia  1957  30.332  9240934   820.8530      779.4453
+##  2     Albania    Europe  1957  59.280  1476505  1942.2842     1601.0561
+##  3     Algeria    Africa  1957  45.685 10270856  3013.9760     2449.0082
+##  4      Angola    Africa  1957  31.999  4561361  3827.9405     3520.6103
+##  5   Argentina  Americas  1957  64.399 19610538  6856.8562     5911.3151
+##  6   Australia   Oceania  1957  70.330  9712569 10949.6496    10039.5956
+##  7     Austria    Europe  1957  67.480  6965860  8842.5980     6137.0765
+##  8     Bahrain      Asia  1957  53.832   138655 11635.7995     9867.0848
+##  9  Bangladesh      Asia  1957  39.348 51365468   661.6375      684.2442
+## 10     Belgium    Europe  1957  69.240  8989111  9714.9606     8343.1051
+## # ... with 1,552 more rows
+```
+
+```r
 ## lag or lead will shift the vector, however they will create NA value, use !is.na to filter out the na value.
 ```
 
@@ -490,7 +979,8 @@ __Exercise 2__: For the `gapminder` dataset, make a spaghetti plot showing the p
 - Move the colour scale to the bottom.
 - Rename the colour legend
 
-```{r}
+
+```r
 gapminder %>%
   group_by(country) %>%
   mutate(max_gdpPercap=max(gdpPercap)) %>%
@@ -505,10 +995,48 @@ gapminder %>%
   scale_x_continuous("", # remove x-axis title
                      breaks=c(1950,1975,2000)) +
   scale_color_continuous("log Maximum\nGDP per capita")
+```
+
+![](cm008_Notes_and_Exercises_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+
+```r
   theme(axis.text.x=element_text(angle=90),
         #rotate the x-axis labels to be vertical
         plot.title=element_text(hjust=0.5),
         legend.position="bottom") # move the color scale to the bottom
-  
+```
+
+```
+## List of 3
+##  $ axis.text.x    :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : NULL
+##   ..$ vjust        : NULL
+##   ..$ angle        : num 90
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  $ legend.position: chr "bottom"
+##  $ plot.title     :List of 11
+##   ..$ family       : NULL
+##   ..$ face         : NULL
+##   ..$ colour       : NULL
+##   ..$ size         : NULL
+##   ..$ hjust        : num 0.5
+##   ..$ vjust        : NULL
+##   ..$ angle        : NULL
+##   ..$ lineheight   : NULL
+##   ..$ margin       : NULL
+##   ..$ debug        : NULL
+##   ..$ inherit.blank: logi FALSE
+##   ..- attr(*, "class")= chr [1:2] "element_text" "element"
+##  - attr(*, "class")= chr [1:2] "theme" "gg"
+##  - attr(*, "complete")= logi FALSE
+##  - attr(*, "validate")= logi TRUE
 ```
 
