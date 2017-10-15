@@ -1,6 +1,8 @@
 ---
 title: "Untitled"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 ---
 title: "cm009 Notes and Exercises: Table Joins"
@@ -11,6 +13,7 @@ output: github_document
 ```{r}
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(gapminder))
+library(tidyverse)
 ```
 
 
@@ -21,11 +24,11 @@ After going through the `dplyr` [vignette](https://cran.r-project.org/web/packag
 3. Set operations - take two tables with the same variables, intersection, unions, set difference, etc.
 
 ```{r}
-library("nycflights13")
-flights2 <- flights %>% select(year:day, hour, origin, dest, tailnum, carrier)
+# library("nycflights13")
+# flights2 <- flights %>% select(year:day, hour, origin, dest, tailnum, carrier)
 
-flights2 %>% 
-  left_join(airlines)
+# flights2 %>% 
+  #left_join(airlines)
 # finds common variables in both data frames and match up to map the names
 # if the name is not found, it will keep rows in the original one, and also keep things that are not found
 
@@ -90,7 +93,7 @@ semi_join(areas, gapminder)
 
 5. Construct a tibble that joins `gapminder` and `areas`, so that all rows found in each original tibble are also found in the final tibble. 
 ```{r}
-full_join(areas, gapminder) %>%
+full_join(areas, gapminder)
 ```
 
 
