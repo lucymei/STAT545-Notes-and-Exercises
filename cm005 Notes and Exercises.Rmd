@@ -101,9 +101,10 @@ summary(iris)
     (a) Make a histogram
     (b) Make a table of frequencies
 ```{r}
-iris$Petal.Width
-hist(x)
-table(x)
+iris$Petal.Width %>%
+  hist()
+iris$Petal.Width %>%
+  table()
 ```
 
 ### 2.2 `dplyr` fundamentals
@@ -209,7 +210,7 @@ filter(gapminder, (country =="Canada")|(country =="Algeria" & year %in% 1960:196
 4. Find all entries _not_ including European countries.
 ```{r}
 filter(gapminder, !(continent =="Europe"))
-filter(gapminder, contienent !="Europe")
+filter(gapminder, continent !="Europe")
 ```
 
 #### `select`
