@@ -1,13 +1,8 @@
----
-title: "cm006 Notes and Exercises: Intro to ggplot2"
-date: '2017-09-21'
-output: 
-    html_document:
-      keep_md: yes
-      toc: yes
----
+# cm006 Notes and Exercises: Intro to ggplot2
+2017-09-21  
 
-```{r}
+
+```r
 suppressPackageStartupMessages(library(tidyverse))  # The tidyverse contains ggplot2!
 suppressPackageStartupMessages(library(gapminder))
 knitr::opts_chunk$set(fig.width=4, fig.height=3)
@@ -59,10 +54,13 @@ Quick ways:
 
 Let's just see the syntax right off the bat.
 
-```{r}
+
+```r
 ggplot(gapminder, aes(x=year, y=lifeExp)) +
     geom_point()
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 Can add size = another variable.
 aes = link the x and y
 ggplot(gapminder, aes(x=year, y=lifeExp)) - just set up the plot with scales but without the points.
@@ -98,10 +96,13 @@ Asthetic
 
 Let's revisit the above plot. The first line outputs an empty plot because there are no `geom`'s (geometric objects):
 
-```{r}
+
+```r
 p <- ggplot(gapminder, aes(x=year, y=lifeExp))
 p
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
 (Yes, we can assign ggplots to variables in R)
 
@@ -109,18 +110,24 @@ Contains:
     1. the data frame, `gapminder`, and
     2. an indication of which variables in the data frame go with which scale.
 
-```{r}
+
+```r
 p <- ggplot(gapminder, aes(x=year, y=lifeExp))
 p + geom_point()
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 Next, we can add a _layer_ with the `+` symbol. We add the "point" geometry to "execute" the setup and display points, to obtain the original plot.
 
 This plot would benefit with some _alpha transparency_ -- another type of scale. Let's put in 25% transparency:
 
-```{r}
+
+```r
 p + geom_point(alpha=0.25)
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 alpha - to avoid overploting, every point has 25% transparency but when they are layering the overlapping parts become darker.
 
 The unit of the plot - character expansion (between 1 and 10)
@@ -130,47 +137,64 @@ Notes:
     - This scale is _outside of an aesthetic mapping_, meaning that ggplot will not associate it with a variable.
     - Scales can be indicated in the `geom` call. Scales within `aes` that appear in the `ggplot` function apply "globally" to the plot. 
     
-```{r}
+
+```r
 p + geom_point(aes(alpha=0.25))
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 Now you are assigning a vairable 0.25, so it will appear in every plot
 Can put the aes in ggplot (over all plot), if put into geom_point, it will be in the layer of points only.
-```{r}
+
+```r
 ggplot(gapminder) + 
   geom_point(aes(x=year, y =lifeExp))
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 
 __Exercises__:
 
 1. Make a scatterplot of `gdpPercap` vs `lifeExp`. Store it in a variable called `p2`.
-```{r}
+
+```r
 p2 <- ggplot(gapminder, aes(x=gdpPercap, y=lifeExp))
 p2 + geom_point()
 ```
 
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 
 
 2. To `p2`, make the size of the points indicate the `year`, choose a level of alpha transparency that you're happy with, and make the points your favourite colour.
-```{r}
+
+```r
 p2 + geom_point(aes(size = year), color="red", alpha=0.25)
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 Have to add color = "red" outside the aes bracket so that ggplot will not recognize it as a variable.
 
 
 3. To `p2`, colour the points by `continent`. but this time with year being represented by the size of the points.
-```{r}
+
+```r
 p2 + geom_point(aes(colour = continent, size=year), alpha=0.25)
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 
 4. To `p2`, add another layer called `scale_x_log10()`. Make a second plot by redoing the plot in (1), but replacing `gdpPercap` with `log10(gdpPercap)`. What do you notice?
 
-```{r}
-p2 + geom_point(aes(colour = continent, size=year), alpha=0.25) + scale_x_log10()
 
+```r
+p2 + geom_point(aes(colour = continent, size=year), alpha=0.25) + scale_x_log10()
 ```
+
+![](cm006_Notes_and_Exercises_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 scale_x_log10() is a handy function to make log10 graph.
 
 
