@@ -1,13 +1,8 @@
----
-title: "cm007 Notes and Exercises: ggplot2, Round 2"
-date: '2017-09-26'
-output: 
-    html_document:
-      keep_md: yes
-      toc: yes
----
+# cm007 Notes and Exercises: ggplot2, Round 2
+2017-09-26  
 
-```{r}
+
+```r
 suppressPackageStartupMessages(library(tidyverse))  # The tidyverse contains ggplot2!
 suppressPackageStartupMessages(library(gapminder))
 knitr::opts_chunk$set(fig.width=4, fig.height=3)
@@ -31,39 +26,60 @@ To add a regression line/curve, add a layer `geom_smooth` to your plot. Probably
 
 Examples:
 
-```{r}
+
+```r
 vc1 <- ggplot(gapminder, aes(year, lifeExp)) +
     geom_point() 
 vc1 + geom_smooth(se=FALSE)
+```
+
+```
+## `geom_smooth()` using method = 'gam'
+```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 vc1 + geom_smooth(method="lm")
 ```
 
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-2-2.png)<!-- -->
+
 
 __Exercise 1__: Make a plot of `year` (x) vs `lifeExp` (y), with points coloured by continent. Then, to that same plot, fit a straight regression line to each continent, without the error bars. If you can, try piping the data frame into the `ggplot` function.
-```{r}
+
+```r
 library(gapminder)
 library(tidyverse)
 p1 <- ggplot(gapminder, aes(year, lifeExp)) + geom_point(aes(x=year, y=lifeExp, color = continent)) + geom_smooth(method="lm", se=FALSE)
-
 ```
 This wont work because it is plotting everything.
-```{r}
+
+```r
 ggplot(gapminder, aes(year, lifeExp, colour=continent)) + geom_point(aes(x=year, y=lifeExp)) + geom_smooth(method="lm", se=FALSE)
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 Want the color grouping to be global so we need to specify it in the global gapminder set up.
 
 
 __Exercise 2__: Repeat Exercise 1, but switch the _regression line_ and _geom\_point_ layers. How is this plot different from that of Exercise 1?
-```{r}
+
+```r
 ggplot(gapminder, aes(year, lifeExp, colour=continent)) + geom_smooth(method="lm", se=FALSE) + geom_point()
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 The lines are underneatht the points.
 
 
 __Exercise 3__: Omit the `geom_point` layer from either of the above two plots (it doesn't matter which). Does the line still show up, even though the data aren't shown? Why or why not?
-```{r}
+
+```r
 ggplot(gapminder, aes(year, lifeExp, colour=continent)) + geom_smooth(method="lm", se=FALSE)
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 
 
@@ -72,12 +88,20 @@ ggplot(gapminder, aes(year, lifeExp, colour=continent)) + geom_smooth(method="lm
 
 We saw that we can __group__ by using scales. For example, we can distinguish continents by using different shape or colour:
 
-```{r}
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point(aes(colour=continent))
+```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     geom_point(aes(shape=continent))
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
 
 But these plots can get overloaded. In comes __facetting__ to save the day! Let's add this to our list of concepts:
 
@@ -93,11 +117,14 @@ Facetting separates data from each group into its own "mini plot", called a _pan
 
 `facet_wrap` puts the panels in "reading order", and goes to a new line if there's not enough room. Mandatory argument specification is `facet_wrap(~ VARIABLE)`. Example:
 
-```{r, fig.width=8}
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     facet_wrap(~ continent) +
     geom_point()
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 The y-axis of these plots are lined up.
 
 
@@ -106,10 +133,117 @@ scales = if you want to unify the scales
 
 
 __Exercise 4__: Make a plot of `year` (x) vs `lifeExp` (y), facetted by continent. Then, fit a smoother through the data for each continent, without the error bars. Choose a span that you feel is appropriate.
-```{r}
+
+```r
 ggplot(gapminder, aes(year,lifeExp)) + facet_wrap(~ continent)+
   geom_smooth(se=FALSE, span=0.2) + geom_point()
 ```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 1951.7
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 10.275
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 4.2234e-17
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 105.58
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 1951.7
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 10.275
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 1.9873e-16
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 105.58
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 1951.7
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 10.275
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 4.3417e-16
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 105.58
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 1951.7
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 10.275
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 1.1674e-16
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 105.58
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 1951.7
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 5.275
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0
+```
+
+```
+## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 27.826
+```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 Smaller span value = overfit
 
 
@@ -117,13 +251,16 @@ Smaller span value = overfit
 
 Example: Let's also facet by "small" (<=7,000,000 population) and "large" (>7,000,000 population) countries. We'll need to add a "size" variable; we'll do that with `dplyr`, and pipe the result into the `ggplot` function:
 
-```{r, fig.width=8}
+
+```r
 vc2 <- gapminder %>% 
     mutate(size=c("small", "large")[(pop>7000000) + 1]) %>% 
     ggplot(aes(gdpPercap, lifeExp)) +
     facet_grid(size ~ continent) 
 vc2 + geom_point()
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 facet by continent and the new size variable.
 mutate() to add a new variable called size, when it is pop>7000000 it is going to large, when its 1 it is going to small.
 
@@ -134,19 +271,29 @@ Everything we've learned prior to this works in conjunction with facetting:
 
 - Colours:
 
-```{r, fig.width=8}
+
+```r
 vc2 + geom_point(aes(colour=year))
 ```
 
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 - Regression curves and log scales:
 
-```{r, fig.width=8}
+
+```r
 vc2 + 
     geom_point(colour="brown",
                alpha=0.2) +
     geom_smooth() +
     scale_x_log10()
 ```
+
+```
+## `geom_smooth()` using method = 'loess'
+```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 
 ### Connect the dots with `geom_line` 
@@ -162,14 +309,22 @@ With these `geom`s, it's so important to remember to specify `group=VARIABLE` in
 
 Example: life expectancy over time for each country.
 
-```{r}
+
+```r
 ## Without the `group` specification:
 ggplot(gapminder, aes(year, lifeExp)) +
     geom_line()
+```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
+```r
 ## With the group specification:
 ggplot(gapminder, aes(year, lifeExp, group=country)) +
     geom_line(alpha=0.2)
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-13-2.png)<!-- -->
 
 PS: such "spaghetti plots" _are_ actually useful -- they give us a sense of the _distribution_ of trends. 
 Connects the dots from left to right.
@@ -178,7 +333,8 @@ Connects the dots from left to right.
 
 `geom_path` is typically used when a "time" variable is not shown on an axis. For example, let's look at a scatterplot of `pop` vs. `gdpPercap` of Afghanistan, and let's "connect the dots" in the order of time.
 
-```{r}
+
+```r
 gapminder %>%
     filter(country=="Afghanistan") %>% 
     arrange(year) %>% 
@@ -186,23 +342,34 @@ gapminder %>%
     geom_point() +
     geom_path()
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 Arrgange the points first by year, so that geom_path can connect them according to the time.
 
 
 We can see the _path_ that the population and GDP per capita took for Afghanistan. 
 
 __Exercise 5__: Plot the population over time (year) using lines, so that each country has its own line. Colour by `gdpPercap`. Add alpha transparency to your liking. 
-```{r}
+
+```r
   ggplot(gapminder, aes(year, pop, group=country, color=gdpPercap)) + geom_line(alpha=0.2) 
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 
 
 
 __Exercise 6__: Add points to the plot in Exercise 5.
-```{r}
+
+```r
 ggplot(gapminder, aes(year, pop, group=country, color=gdpPercap)) + geom_point() + geom_line(alpha=0.2)
 ```
-```{r}
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+
+```r
 ggplot(gapminder, aes(year, pop, group=country)) + geom_point() + geom_line(aes(color=gdpPercap, alpha=0.2))
 ```
+
+![](cm007_notes_and_exercises_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
