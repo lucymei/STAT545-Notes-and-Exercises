@@ -1,0 +1,27 @@
+---
+title: "Cm004"
+output: pdf_document
+---
+# Level 1 header 
+## This is my header
+
+This is a line of text.
+
+- bullet 1
+- bullet 2
+
+#command option i (or click insert, R) gives you the R chunck#
+```{r}
+x <- rnorm(100)
+y <- rnorm(100)
+plot(x,y)
+```
+#command option c to run the current code chunk#
+#command option n to run the next code chunk#
+# can name a chunck by entering the name or figure size after {r
+#echo = FALSE - will execute the code but will not show it as a result 
+
+```{r this is the third chunk}
+summary(x)
+```
+

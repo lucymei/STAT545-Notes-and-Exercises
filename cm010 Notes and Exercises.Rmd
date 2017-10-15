@@ -1,0 +1,142 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+left_join()
+inner_join()
+full_join()
+anti_join()
+semi_join()
+```
+
+```{r}
+install.packages("devtools")
+```
+
+```{r}
+library(devtools)
+install_github("JoeyBernhardt/singer")
+```
+
+Now we have the singer dataframes
+
+```{r}
+library(singer)
+```
+
+and then we load into the environment the datasets
+
+```{r}
+data("locations")
+data("songs")
+```
+
+and we can give a look at them
+
+```{r}
+glimpse(songs)
+```
+
+```{r}
+glimpse(locations)
+```
+
+```{r}
+View(songs)
+View(locations)
+```
+
+### Release and Year
+Produce a dataframe with all the albums, the artists and the year in which album was published.
+
+```{r}
+relartyear <- inner_join(locations, songs, by= c("title", "artist_name")) %>%
+  select(release, artist_name,year)
+
+View(relartyear)
+
+```
+We can use title to join because each title is unique.
+Can aligned by two variables.
+
+
+### challenge 1
+Get the number of releases per year
+
+```{r}
+inner_join(songs, locations, by="title") %>%
+  count(year)
+```
+
+## Reshaping
+
+```{r}
+data("singer_locations")
+glimpse(singer_locations)
+
+View(singer_locations) #This is a wide data frame - all in a wide horizontal form
+```
+```{r}
+hfd_y <- singer_locations %>%
+  select(year, artist_hotttnesss, artist_familiarity, duration)
+
+hfd_y %>%
+  ggplot(aes(x=year, y=duration)) +
+  geom_line()
+```
+There is missing data in years and it causes the weird graph.
+We need to filter out some years.
+```{r}
+hfd_y %>%
+  filter(year >1900) %>%
+  ggplot(aes(x=year, y=duration)) +
+  geom_point()
+```
+
+```{r}
+hfd_y %>%
+  filter(year >1900) %>%
+  ggplot(aes(x=year, y=artist_hotttnesss)) +
+  geom_point()
+```
+
+
+To get a long data frame.
+package "tidyr", "gather()": from wide to long
+```{r}
+hfd_y_long <- hfd_y %>%
+  gather(key="Measure", value = "Units", artist_hotttnesss:duration)
+
+View(hfd_y)
+View(hfd_y_long)
+```
+```{r}
+hfd_y_long %>%
+  filter(year > 1900) %>%
+  ggplot(aes(x=year, y = Units)) +
+  geom_point() +
+  facet_wrap(~ Measure)
+```
+How to fix the scale?
+```{r}
+hfd_y_long %>%
+  filter(year > 1900) %>%
+  ggplot(aes(x=year, y = Units)) +
+  geom_point() +
+  facet_wrap(~ Measure) +
+  
+```
+
+
+**WIDE** dataframe
+**LONG** dataframe

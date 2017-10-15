@@ -1,0 +1,92 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(singer)
+data("singer_locations")
+
+```
+
+
+```{r}
+# artist_hottness, artist_familiarity, duration
+hfd_y <- singer_locations %>%
+  select(song_id,year,duration:artist_familiarity) %>% #select columns that we want to gather.
+  gather(key= "Measures", value = "My_value",
+         duration:artist_familiarity) # which column do we want to spread, this will select from duration to artist_familiarity.
+# we throw away some information about the unique rows so we can cause problems later on when we want to spread.
+# We need to find something that is unique, such as song_id
+View(hfd_y)
+```
+
+```{r}
+my_plot <- hfd_y %>%
+  filter(year > 1950) %>%
+  ggplot(aes(x=year, y = My_value)) +
+  geom_point() +
+  facet_wrap(~ Measures, scales = "free_y") # want to free x and y scales if different groups have different ranges for x and y, or we can choose to just free one axis.
+my_plot
+```
+We need to modify the plots.
+
+
+
+### Doomed challenge 1
+
+```{r}
+# Bring hfd_y in the wide format
+hfd_y %>%
+  spread(Measures, My_value) # I want to find 2007 three times but 2007 is not identified repeadly. It finds three values for duration 2007.
+```
+
+
+### Hopeful challenge 2
+```{r}
+# Fix hfd_y )build it better, gather and spread
+# Spread and gather will only work when there is an unique identifier 
+
+```
+
+```{r}
+install.packages("reshape2")
+```
+```{r}
+hfd_y_mean <-hfd_y %>%
+  reshape2::dcast(year~Measures,
+        value.var="My_value",
+        fun.aggregate=var, na.rm=TRUE) # can tell reshape2 that there are more than two 
+# aggregate function - when we have more than one values, we use aggregation function - take in more than one value and return one value
+# when there is more than one value, use mean 
+View(hfd_y_mean)
+# get year, artist_familiarity, artist_hotttnesss, duration, but duration is no longer "year", it is some weird numbers which is the variance of the songs for that duration
+# if we don't want to use reshape2, can use group_by and summarize
+```
+
+function
+dataframe
+
+str(hfd_y_mean)
+typeof(hfd_y_mean)
+class(hfd_y_mean)
+
+double is a special kind of number
+can define a number as an integer by adding L after the number
+
+### challenge 3
+What kind of stuff is my_plot?
+```{r}
+typeof(my_plot)
+class(my_plot)
+```
+
+
+### challenge 4
+What kind of stuff is %>% ?
+```{r}
+typeof(`%>%`)
+class(`%>%`)
+```
+
