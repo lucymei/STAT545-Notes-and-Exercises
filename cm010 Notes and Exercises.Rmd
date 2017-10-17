@@ -1,6 +1,8 @@
 ---
 title: "Untitled"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -11,31 +13,25 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
 
-```{r}
+
 left_join()
 inner_join()
 full_join()
 anti_join()
 semi_join()
-```
 
-```{r}
-install.packages("devtools")
-```
+
 
 ```{r}
 library(devtools)
 install_github("JoeyBernhardt/singer")
+library(singer)
 ```
 
 Now we have the singer dataframes
 
-```{r}
-library(singer)
-```
 
 and then we load into the environment the datasets
-
 ```{r}
 data("locations")
 data("songs")
@@ -51,10 +47,10 @@ glimpse(songs)
 glimpse(locations)
 ```
 
-```{r}
+
 View(songs)
 View(locations)
-```
+
 
 ### Release and Year
 Produce a dataframe with all the albums, the artists and the year in which album was published.
@@ -127,15 +123,7 @@ hfd_y_long %>%
   geom_point() +
   facet_wrap(~ Measure)
 ```
-How to fix the scale?
-```{r}
-hfd_y_long %>%
-  filter(year > 1900) %>%
-  ggplot(aes(x=year, y = Units)) +
-  geom_point() +
-  facet_wrap(~ Measure) +
-  
-```
+
 
 
 **WIDE** dataframe
