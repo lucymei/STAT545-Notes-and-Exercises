@@ -1,9 +1,4 @@
----
-title: "Special visualization analysis and design"
-output: 
-  html_document: 
-    keep_md: yes
----
+# Special visualization analysis and design
 
 ### Nested model: Four levels of vis design
 
