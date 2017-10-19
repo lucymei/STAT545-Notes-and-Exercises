@@ -1,0 +1,24 @@
+---
+title: "Untitled"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+### Nested model: Four levels of vis design
+
+-domain situation
+  - who are the target user
+-abstraction
+-idiom
+  - how it is shown?
+  
+### Why is validation difficult?
+- Solution: use methods from different fields at each level
+- Domain situation - observe target users using existing tools
+- Date/task abstraction
+- Visual encoding/interaction idiom - justify design with respect to alternatives
+- Algorithm - Meansure system time/memory, analyze computational complexity
+- Analyze results qualitatively - Measure human time with lab experiment (lab study)
+- Observe target users after depolyment (field study)
+- Measure adoption
