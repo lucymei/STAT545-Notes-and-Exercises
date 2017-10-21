@@ -1,9 +1,4 @@
----
-title: "cm013 Notes and Exercises"
-output: 
-  html_document: 
-    keep_md: yes
----
+# cm013 Notes and Exercises
 
 ---
 title: "cm013 Notes and Exercises"
@@ -14,9 +9,7 @@ output:
         toc: true
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.width=5, fig.height=3, fig.align="center")
-```
+
 
 Today we'll talk about a collection of plotting-related things. These notes consist of my own musings, along with ideas from Jenny's notes here:
 
@@ -25,7 +18,8 @@ Today we'll talk about a collection of plotting-related things. These notes cons
 - [Secrets of a happy graphing life](block016_secrets-happy-graphing.html)
 - [Writing figures to file](block017_write-figure-to-file.html)
    
-```{r}
+
+```r
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(gapminder))
 ```
@@ -58,20 +52,36 @@ Some examples follow.
 
 To make the following two plots, this code is repetitive:
 
-```{r}
+
+```r
 ggplot(gapminder, aes(year, lifeExp)) + 
     geom_jitter(alpha=0.5)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+
+```r
 ggplot(gapminder, aes(year, lifeExp)) + 
     geom_line(aes(group=country), alpha=0.2)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-2-2.png" style="display: block; margin: auto;" />
+
 The first line is repetitive. Let's assign the first line to a variable, to avoid repeating ourselves:
 
-```{r}
+
+```r
 p <- ggplot(gapminder, aes(year, lifeExp))
 p + geom_jitter(alpha=0.5)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+
+```r
 p + geom_line(aes(group=country), alpha=0.2)
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-3-2.png" style="display: block; margin: auto;" />
 It is better to assign the base of ggplot to a variable and then add layer on it.
 
 #### One-time data wrangling
@@ -80,25 +90,31 @@ Let's say you want to run an analysis on Chile's `gapminder` data.
 
 You might be tempted to make a plot:
 
-```{r}
+
+```r
 gapminder %>% 
     filter(country == "Chile") %>% 
     arrange(year) %>% 
     ggplot(aes(gdpPercap, lifeExp)) +
     geom_path()
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" />
 If this plot is the only thing that I am using the filtered data. However, if I will use this data in the future, it is better to save the data to a variable.
 But then you have to re-wrangle the data for your downstream analyses!
 
 Try this:
 
-```{r}
+
+```r
 gapminder_chile <- gapminder %>% 
     filter(country == "Chile") %>% 
     arrange(year)
 ggplot(gapminder_chile, aes(gdpPercap, lifeExp)) +
     geom_path()
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
 Now you can run further analyses on `gapminder_chile`. 
 
@@ -115,39 +131,49 @@ We'll see this in the next topic, but saving to file:
 
 Feel the need to do this?
 
-```{r}
+
+```r
 p <- ggplot(gapminder, aes(year, lifeExp))
 p <- p + geom_line(aes(group=country), alpha=0.2, colour="red")
 p <- p + geom_point(alpha=0.5)
 p
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+
 This relies on you _always_ executing these lines from top to bottom -- and I can assure you, when programming interactively, this does not always happen.
 
 Better is this...
 
-```{r}
+
+```r
 p1 <- ggplot(gapminder, aes(year, lifeExp))
 p2 <- p1 + geom_line(aes(group=country), alpha=0.2, colour="red")
 p3 <- p2 + geom_point(alpha=0.5)
 p3
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+
 But even better would be to get rid of the chain of `p`'s altogether. They're just confusing and make the code hard to read.
 
 Easy-to-read version:
 
-```{r}
+
+```r
 ggplot(gapminder, aes(year, lifeExp)) +
     geom_line(aes(group=country), alpha=0.2, colour="red") +
     geom_point(alpha=0.5)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+
 ### 1.2 Keep stuff in data frames
 
 Do you find yourself doing the following?
 
-```{r}
+
+```r
 life_exp <- gapminder$lifeExp
 year <- gapminder$year
 ```
@@ -161,14 +187,36 @@ Problems:
 
 It's better practice to work directly from the data frame. Most "high-use" R functions require the specification of a data frame:
 
-```{r}
+
+```r
 lm(lifeExp ~ year, data=gapminder)
+```
+
+```
+## 
+## Call:
+## lm(formula = lifeExp ~ year, data = gapminder)
+## 
+## Coefficients:
+## (Intercept)         year  
+##   -585.6522       0.3259
 ```
 
 ...is better than
 
-```{r}
+
+```r
 lm(life_exp ~ year)
+```
+
+```
+## 
+## Call:
+## lm(formula = life_exp ~ year)
+## 
+## Coefficients:
+## (Intercept)         year  
+##   -585.6522       0.3259
 ```
 
 But not all functions allow the input of a data frame -- let's try finding the correlation of two variables:
@@ -180,8 +228,13 @@ cor(lifeExp, gdpPercap, data=gapminder)
 
 Instead, use the `with` function. Syntax: `with(dataframe, function_of_df_variables)`.
 Take variables from a dataframe and do something to it.
-```{r}
+
+```r
 with(gapminder, cor(lifeExp, gdpPercap))
+```
+
+```
+## [1] 0.5837062
 ```
 
 ### 1.3 Making data frames/Tibbles
@@ -190,18 +243,43 @@ Consider putting variables into a data frame instead of having them as loose var
 
 - Old-school way: `data.frame`
 
-```{r}
+
+```r
 data.frame(x = 1:5, 
            y = (1:5)^2, 
            text = c("alpha", "beta", "gamma", "delta", "epsilon"))
 ```
 
+```
+##   x  y    text
+## 1 1  1   alpha
+## 2 2  4    beta
+## 3 3  9   gamma
+## 4 4 16   delta
+## 5 5 25 epsilon
+```
+
 - Easier way: `tibble::tibble()`, or `tribble()` for smaller data frames "by hand". Jenny's example:
 Allow back reference to the data that you have made.
-```{r}
+
+```r
 tibble(x = 1:5,
        y = x ^ 2,
        text = c("alpha", "beta", "gamma", "delta", "epsilon"))
+```
+
+```
+## # A tibble: 5 x 3
+##       x     y    text
+##   <int> <dbl>   <chr>
+## 1     1     1   alpha
+## 2     2     4    beta
+## 3     3     9   gamma
+## 4     4    16   delta
+## 5     5    25 epsilon
+```
+
+```r
 ## if you're truly "hand coding", tribble() is an alternative
 tribble(
   ~ x, ~ y,    ~ text,
@@ -213,11 +291,39 @@ tribble(
 )
 ```
 
+```
+## # A tibble: 5 x 3
+##       x     y    text
+##   <dbl> <dbl>   <chr>
+## 1     1     1   alpha
+## 2     2     4    beta
+## 3     3     9   gamma
+## 4     4    16   delta
+## 5     5    25 epsilon
+```
+
 - `expand.grid` is also a useful function. Makes a row for every combination:
 Matches A with 1 to 4......
-```{r}
+
+```r
 expand.grid(type=c("A", "B", "C"),
             level=1:4)
+```
+
+```
+##    type level
+## 1     A     1
+## 2     B     1
+## 3     C     1
+## 4     A     2
+## 5     B     2
+## 6     C     2
+## 7     A     3
+## 8     B     3
+## 9     C     3
+## 10    A     4
+## 11    B     4
+## 12    C     4
 ```
 
 
@@ -279,7 +385,8 @@ ggsave("my_plot.png", p)
 
 Sometimes you'll end up seeing an empty plot. More details can be found [here](http://stat545.com/block017_write-figure-to-file.html#despair-over-non-existent-or-empty-figures), but one example is when using a `for` loop:
 
-```{r}
+
+```r
 for (i in 1){
     qplot(1,1)
 }
@@ -287,12 +394,15 @@ for (i in 1){
 
 Nothing appears. This is because you need to wrap the plot with `print`:
 Only print things outside of the for loop.
-```{r}
+
+```r
 for (i in 1){
     qplot(1,1) %>% 
         print
 }
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" />
 
 PS: when working interactively, `print` is usually run for you "behind the scenes".
 
@@ -304,7 +414,8 @@ Don't like the default colour scheme that comes with `ggplot2`? Let's say we wan
 
 (Psst: for `p1`, can you see the difference between `colour` and `fill`?)
 
-```{r}
+
+```r
 # Colouring by qualitative variable
 (p1 <- gapminder %>% 
         filter(year > 1990) %>%
@@ -313,12 +424,20 @@ Don't like the default colour scheme that comes with `ggplot2`? Let's say we wan
                  position="dodge",
                  colour="black") +
         scale_y_continuous("GDP Per Capita"))
+```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" />
+
+```r
 # Colouring by continuous variable
 (p2 <- ggplot(gapminder, aes(gdpPercap, lifeExp)) +
         geom_point(aes(colour=year)) +
         scale_x_log10())
+```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-18-2.png" style="display: block; margin: auto;" />
+
+```r
 # Diverging scale - either large in negative or large in positive 
 (p3 <- gapminder %>% 
         filter(continent=="Europe") %>% 
@@ -330,6 +449,8 @@ Don't like the default colour scheme that comes with `ggplot2`? Let's say we wan
         geom_point(aes(colour=chpop)) +
         scale_x_log10())
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-18-3.png" style="display: block; margin: auto;" />
 
 Each of these plots represent different types of scales. Here are the scales, and the corresponding `ggplot2` scales to modify the colours:
 
@@ -344,41 +465,64 @@ Note: there's also `scale_colour_gradientn` (generalization of the diverging sca
 
 Let's try the qualitative plot:
 
-```{r}
+
+```r
 my_cols <- c("red", "blue", "green", "wheat3", "orange")
 p1 + scale_fill_manual(values=my_cols)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" />
+
+```r
 # You can even name the colour vector according the levels:
 names(my_cols) <- c("Europe", "Americas", "Africa", "Asia", "Oceania")
 p1 + scale_fill_manual(values=my_cols)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-19-2.png" style="display: block; margin: auto;" />
+
 The sequential plot:
 
-```{r}
+
+```r
 p2 + scale_colour_gradient(low="black", high="red")
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" />
+
 The diverging plot:
 
-```{r}
+
+```r
 p3 + scale_colour_gradient2(low="blue", mid="white", high="red")
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" />
 
 ### 3.2 Identifying Colours in R
 
 How would anyone know that R understands `wheat3`? R has lots of colours pre-defined -- see them all by running `colors()`:
 
-```{r}
+
+```r
 colors() %>% head
+```
+
+```
+## [1] "white"         "aliceblue"     "antiquewhite"  "antiquewhite1"
+## [5] "antiquewhite2" "antiquewhite3"
 ```
 
 Or, check out Jenny's cheatsheet with [white background](http://stat545.com/img/r.col.white.bkgd.pdf) or [black background](http://stat545.com/img/r.col.black.bkgd.pdf).
 
 You could also specify the hexadecimal colour. 
 
-```{r}
+
+```r
 p1 + scale_fill_manual(values=c("#9b5123", "#5dd8a6", "#11ad52", "#dde91d", "#0113d7"))
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" />
 
 ### 3.3 Palettes
 
@@ -386,10 +530,13 @@ Unless you're an expert in colours, it's best to leave choosing colours to an ex
 
 The `RColorBrewer` is a nice R package, based on designs by Cynthia Brewer, a colour expert. Here are the palettes available:
 
-```{r, fig.width=5, fig.height=10}
+
+```r
 library(RColorBrewer)
 display.brewer.all()
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" />
 
 Notice that they're separated into the three types of scales. 
 
@@ -397,27 +544,53 @@ Of note: the qualitative scales consist of colours of equal "importance" -- not 
 
 Let's display and print the hexadecimal codes of the `Dark2` palette -- the first 5. Note that we need to specify the number of colours from the palette!
 
-```{r}
+
+```r
 display.brewer.pal(n=5, "Dark2")
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" />
+
+```r
 brewer.pal(n=5, "Dark2") # to extract the code for the color
+```
+
+```
+## [1] "#1B9E77" "#D95F02" "#7570B3" "#E7298A" "#66A61E"
 ```
 
 Go ahead and put this into the qualitative plot:
 
-```{r}
+
+```r
 p1 + scale_fill_manual(values=brewer.pal(n=5, "Dark2"))
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" />
 
 We can also use the functions that are built-in to `ggplot2`:
 
 - `scale_colour_brewer` or `scale_fill_brewer`, with the `palette` argument, for _discrete data only_. 
 - `scale_colour_distiller` interpolates the colours in a given palette. 
 
-```{r}
+
+```r
 p1 + scale_colour_brewer(palette="Dark2")
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" />
+
+```r
 p2 + scale_colour_distiller(palette="Greens", direction=1) # direction = 1 or -1 to reverse the color graident or scheme
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-27-2.png" style="display: block; margin: auto;" />
+
+```r
 p3 + scale_colour_distiller(palette="Spectral")
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-27-3.png" style="display: block; margin: auto;" />
 
 
 Other useful R packages:
@@ -425,21 +598,45 @@ Other useful R packages:
 - `dichromat` package. Converts a colour palette into various colour-blind views. 
 - [`viridis`](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html) package. Provides colour-blind friendly scales. 
 
-```{r}
+
+```r
 library(viridis)
+```
+
+```
+## Loading required package: viridisLite
+```
+
+```r
 p2 + scale_colour_viridis(option="inferno")
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" />
+
+```r
 p3 + scale_colour_viridis()
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-28-2.png" style="display: block; margin: auto;" />
 
 # 4 Exercise Set 1
 
 1. Make histograms of Life Expectancies, facetted by `continent`. Paint the histogram by continent, using a colour palette of your choice from `RColorBrewer`.
-```{r}
+
+```r
 ggplot(gapminder, aes(lifeExp)) +
   facet_wrap(~continent) +
   geom_histogram(aes(y=..density.., fill=continent)) +
   scale_fill_brewer(palette="Dark2")
+```
 
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" />
+
+```r
 # If does not add .., it will make y the count.
 ```
 
@@ -447,7 +644,8 @@ ggplot(gapminder, aes(lifeExp)) +
 2. Make a trend plot/spaghetti plot of life Expectancies over time for each country. Highlight Rwanda in red (ensure the legend shows this, too).
 
 BONUS: make all countries besides Rwanda have alpha transparency of 0.2, and Rwanda be non-transparent.
-```{r}
+
+```r
 colour_layer <- scale_colour_manual("", # the empty quote - not specified legend title 
                                      labels =c("Other Countries", "Rwanda"),
                                      values=c("black", "red"))
@@ -457,6 +655,11 @@ ggplot(gapminder, aes(year, lifeExp)) +
                 alpha=country=="Rwanda")) +
   colour_layer +
   scale_alpha_discrete(range=c(0.2, 1), guide=FALSE)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" />
+
+```r
 # If country =="Rwanda", it is true. If not, it is false.
 ```
 
@@ -466,15 +669,28 @@ ggplot(gapminder, aes(year, lifeExp)) +
 
 You might have noticed in the above solutions that we can save individual layers as R variables:
 
-```{r}
+
+```r
 (my_layer <- geom_point(alpha=0.2))
+```
+
+```
+## geom_point: na.rm = FALSE
+## stat_identity: na.rm = FALSE
+## position_identity
+```
+
+```r
 ggplot(gapminder, aes(gdpPercap, lifeExp)) +
     my_layer
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" />
+
 You can also save multiple layers in a _single R variable_ -- a list.
 
-```{r}
+
+```r
 my_layer2 <- geom_line(aes(group=country),
                        alpha=0.2)
 multiple_layers <- list(my_layer, my_layer2)
@@ -482,9 +698,12 @@ ggplot(gapminder, aes(year, lifeExp)) +
     multiple_layers
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" />
+
 This becomes really useful when you want to plot multiple layers iteratively. Let's plot `f(x)=sin(k*x)` where `k` ranges from 1 to 4:
 
-```{r}
+
+```r
 fun_layers <- lapply(1:4, function(k) 
     list(stat_function(fun=function(x) sin(k*x),
                        colour=brewer.pal(8, "Dark2")[k])))
@@ -493,37 +712,58 @@ ggplot(data.frame(x=c(0, 2*pi)), aes(x)) +
     scale_colour_manual(labels=1:4)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" />
+
 Making a legend in this case requires some hard-coding. See [this Stack Overflow page](https://stackoverflow.com/questions/19219411/stat-function-and-legends-create-plot-with-two-separate-colour-legends-mapped-t) for advice. 
 
 # 6 Scatterplot Symbols
 
 You can change the "points" that get plotted in a scatterplot. Anything (?) on your keyboard works with the `shape` argument:
 
-```{r}
+
+```r
 p <- gapminder %>% 
     filter(country == "Canada") %>% 
     ggplot(aes(lifeExp, gdpPercap))
 p + geom_point(shape="%", size=5)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" />
+
+```r
 p + geom_point(shape='"', size=5)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-34-2.png" style="display: block; margin: auto;" />
+
 Or, you can specify a ["`p`lotting `ch`aracter" (pch)](http://www.endmemo.com/program/R/pchsymbols.php) by its symbol number. Let's try `21`.
 
-```{r}
+
+```r
 p + geom_point(shape=21, size=5)
+```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" />
+
+```r
 # Also works:
 p + geom_point(pch=21, size=5)
 ```
 
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-35-2.png" style="display: block; margin: auto;" />
+
 21-pch is great when used in conjunction with a `size` aesthetic:
 
-```{r}
+
+```r
 gapminder %>% 
     filter(continent=="Asia") %>% 
     ggplot(aes(gdpPercap, lifeExp, size=pop)) +
     geom_point(shape=21) +
     scale_x_log10()
 ```
+
+<img src="cm013_Notes_and_Exercises_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" />
 
 ## Exercise Set 2
 
